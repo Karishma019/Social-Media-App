@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API = axios.create({ baseURL: "http://localhost:8080" });
+const API = axios.create({ baseURL: "https://sharezone-api-mern.vercel.app/" });
 
 API.interceptors.request.use((req) => {
   if (localStorage.getItem("profile")) {
@@ -13,17 +13,14 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export const fetchPosts = createAsyncThunk(
-  "posts/fetch",
-  async (_, thunkAPI) => {
-    try {
-      const response = await API.get("/posts");
-      return response.data;
-    } catch (error) {
-      return error.response;
-    }
+export const fetchPosts = createAsyncThunk("posts/fetch", async () => {
+  try {
+    const response = await API.get("/posts");
+    return response.data;
+  } catch (error) {
+    return error.response;
   }
-);
+});
 
 export const createPost = createAsyncThunk("posts/add", async (post) => {
   try {
@@ -33,7 +30,6 @@ export const createPost = createAsyncThunk("posts/add", async (post) => {
     return response.data;
   } catch (error) {
     return error;
-    // return thunkAPI.rejectWithValue(error.response.data);
   }
 });
 
