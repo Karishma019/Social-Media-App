@@ -32,7 +32,7 @@ function Post({
   const user = JSON.parse(localStorage.getItem("profile"));
 
   const userId = user?.result?._id;
-const hasLikedPost = likes.length !== 0 && likes.find((like) => like === userId);
+const hasLikedPost = likes?.find((like) => like === userId);
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
