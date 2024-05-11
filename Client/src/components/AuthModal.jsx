@@ -209,20 +209,22 @@ const AuthModal = ({ isOpen, onClose, setIsModalOpen }) => {
                 type="submit"
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                {isSignIn ? "Sign In" : "Sign Up"}
+                {loading ? (
+                  <ImSpinner9 className="animate-spin" />
+                ) : isSignIn ? (
+                  "Sign In"
+                ) : (
+                  "Sign Up"
+                )}
               </button>
               <button
                 type="button"
                 onClick={toggleSignIn}
                 className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
               >
-                {loading ? (
-                  <ImSpinner9 className="animate-spin" />
-                ) : isSignIn ? (
-                  "Create an Account"
-                ) : (
-                  "Already have an account? Sign in"
-                )}
+                {isSignIn
+                  ? "Create an Account"
+                  : "Already have an account? Sign in"}
               </button>
             </div>
           </form>
