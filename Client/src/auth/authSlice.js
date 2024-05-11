@@ -13,24 +13,34 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export const signIn = createAsyncThunk("auth/signin", async (formData) => {
-  const response = await API.post("/auth/signin", formData);
-  //   localStorage.setItem("profile", JSON.stringify(response.data));
+export const signIn = createAsyncThunk(
+  "auth/signin",
+  async (formData, thunkAPI) => {
+    try {
+      const response = await API.post("/auth/signin", formData);
+      return response.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  }
+);
 
-  return response.data;
-});
-
-export const signUp = createAsyncThunk("auth/signup", async (formData) => {
-  console.log(formData);
-  const response = await API.post("/auth/signup", formData);
-  console.log(response.data);
-  return response.data;
-});
+export const signUp = createAsyncThunk(
+  "auth/signup",
+  async (formData, thunkAPI) => {
+    try {
+      const response = await API.post("/auth/signup", formData);
+      return response.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
+    loggedInUser: null,
     loading: false,
     error: null,
   },
@@ -41,7 +51,8 @@ const authSlice = createSlice({
       state.error = null;
     });
     builder.addCase(signIn.fulfilled, (state, action) => {
-      state.user = action.payload;
+      state.loading = false;
+      state.loggedInUser = action.payload;
       localStorage.setItem("profile", JSON.stringify(action.payload));
       state.error = null;
     });
@@ -56,7 +67,7 @@ const authSlice = createSlice({
     });
     builder.addCase(signUp.fulfilled, (state, action) => {
       state.loading = false;
-      state.user = action.payload;
+      state.loggedInUser = action.payload;
       localStorage.setItem("profile", JSON.stringify(action.payload));
       state.error = null;
     });

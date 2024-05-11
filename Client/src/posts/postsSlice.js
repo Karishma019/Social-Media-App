@@ -13,52 +13,76 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export const fetchPosts = createAsyncThunk("posts/fetch", async () => {
-  const response = await API.get("/posts");
-  return response.data;
-});
+export const fetchPosts = createAsyncThunk(
+  "posts/fetch",
+  async (_, thunkAPI) => {
+    try {
+      const response = await API.get("/posts");
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
 
 export const createPost = createAsyncThunk("posts/add", async (post) => {
-  console.log(post);
-  const response = await API.post("/posts", {
-    ...post,
-  });
-  console.log("posting", response.data);
-  return response.data;
+  try {
+    const response = await API.post("/posts", {
+      ...post,
+    });
+    return response.data;
+  } catch (error) {
+    return error;
+    // return thunkAPI.rejectWithValue(error.response.data);
+  }
 });
 
 export const updatePost = createAsyncThunk(
   "posts/update",
-  async ({ id, post }) => {
-    console.log(post);
-    const response = await API.patch(`/posts/${id}`, {
-      post,
-    });
-    console.log(response.data);
-    return response.data;
+  async ({ id, post }, thunkAPI) => {
+    try {
+      const response = await API.patch(`/posts/${id}`, {
+        post,
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
 );
 
-export const deletePost = createAsyncThunk("posts/delete", async (id) => {
-  const response = await API.delete(`/posts/${id}`);
-  return id;
-});
+export const deletePost = createAsyncThunk(
+  "posts/delete",
+  async (id, thunkAPI) => {
+    try {
+      const response = await API.delete(`/posts/${id}`);
+      return id;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
-export const likePost = createAsyncThunk("posts/like", async (id) => {
-  const response = await API.patch(`/posts/${id}/likes`);
-  console.log(response.data);
-  return response.data;
+export const likePost = createAsyncThunk("posts/like", async (id, thunkAPI) => {
+  try {
+    const response = await API.patch(`/posts/${id}/likes`);
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
+  }
 });
 
 export const commentPost = createAsyncThunk(
   "posts/comments",
-  async ({ id, comment }) => {
-    console.log(comment);
-    const response = await API.post(`/posts/${id}/comments`, {
-      comment: comment,
-    });
-    console.log(response.data);
-    return response.data;
+  async ({ id, comment }, thunkAPI) => {
+    try {
+      const response = await API.post(`/posts/${id}/comments`, {
+        comment,
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
 );
 
@@ -81,7 +105,8 @@ const postsSlice = createSlice({
 
     builders.addCase(fetchPosts.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error;
+      console.log(action);
+      state.error = action.payload;
     });
     builders.addCase(createPost.pending, (state, action) => {
       state.isLoading = true;
@@ -94,6 +119,7 @@ const postsSlice = createSlice({
 
     builders.addCase(createPost.rejected, (state, action) => {
       state.isLoading = false;
+      console.log(action.error);
       state.error = action.error;
     });
     builders.addCase(deletePost.pending, (state, action) => {
@@ -107,7 +133,7 @@ const postsSlice = createSlice({
 
     builders.addCase(deletePost.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error;
+      state.error = action.payload;
     });
     builders.addCase(updatePost.pending, (state, action) => {
       state.isLoading = true;
@@ -122,7 +148,7 @@ const postsSlice = createSlice({
 
     builders.addCase(updatePost.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error;
+      state.error = action.payload;
     });
     builders.addCase(likePost.pending, (state, action) => {
       state.isLoading = true;
@@ -137,7 +163,7 @@ const postsSlice = createSlice({
 
     builders.addCase(likePost.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error;
+      state.error = action.payload;
     });
     builders.addCase(commentPost.pending, (state, action) => {
       state.isLoading = true;
@@ -145,6 +171,7 @@ const postsSlice = createSlice({
 
     builders.addCase(commentPost.fulfilled, (state, action) => {
       state.isLoading = false;
+      console.log(action.payload);
       state.data = state.data.map((post) =>
         post._id === action.payload._id ? action.payload : post
       );
@@ -152,7 +179,7 @@ const postsSlice = createSlice({
 
     builders.addCase(commentPost.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error;
+      state.error = action.payload;
     });
   },
 });

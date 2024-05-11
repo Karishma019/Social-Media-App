@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import AuthRoute from "./Routes/AuthRoute.js";
 import postRoutes from "./Routes/posts.js";
 import cors from "cors";
-
 dotenv.config();
 
 // Routes

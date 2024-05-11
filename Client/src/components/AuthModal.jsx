@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { signIn, signUp } from "../auth/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { ImSpinner9 } from "react-icons/im";
+
 const initialState = {
   firstName: "",
   username: "",
@@ -9,10 +11,12 @@ const initialState = {
   password: "",
 };
 
-const AuthModal = ({ isOpen, onClose }) => {
-  const [isSignIn, setIsSignIn] = useState(false);
+const AuthModal = ({ isOpen, onClose, setIsModalOpen }) => {
+  const [isSignIn, setIsSignIn] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState(initialState);
+  const { loggedInUser, loading, error } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
   const toggleSignIn = () => {
     setIsSignIn(!isSignIn);
@@ -28,16 +32,19 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
 
     if (isSignIn) {
       dispatch(signIn(formData));
-      onClose();
     } else {
       dispatch(signUp(formData));
-      onClose();
     }
   };
+
+  useEffect(() => {
+    if (loggedInUser) {
+      return setIsModalOpen(false);
+    }
+  }, [loggedInUser]);
 
   return (
     <div
@@ -51,6 +58,11 @@ const AuthModal = ({ isOpen, onClose }) => {
           onClick={onClose}
         ></div>
         <div className="relative bg-white rounded shadow-lg w-full max-w-md p-8">
+          {error && (
+            <p className="text-red-500 bg-red-50 p-2 rounded-lg mb-2">
+              {error.message}
+            </p>
+          )}
           <h2 className="text-2xl mb-4 text-black">
             {isSignIn ? "Sign In" : "Sign Up"}
           </h2>
@@ -204,9 +216,13 @@ const AuthModal = ({ isOpen, onClose }) => {
                 onClick={toggleSignIn}
                 className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
               >
-                {isSignIn
-                  ? "Create an Account"
-                  : "Already have an account? Sign in"}
+                {loading ? (
+                  <ImSpinner9 className="animate-spin" />
+                ) : isSignIn ? (
+                  "Create an Account"
+                ) : (
+                  "Already have an account? Sign in"
+                )}
               </button>
             </div>
           </form>

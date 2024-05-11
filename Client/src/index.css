@@ -7,3 +7,17 @@
   width: 90%;
   margin: auto;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle (thumb) */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}

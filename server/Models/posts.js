@@ -6,9 +6,8 @@ const postSchema = mongoose.Schema({
   name: String,
   creator: String,
   imgUrl: String,
-  likes: { type: Number, default: 0 },
-
-  comments: { type: [String], default: [] },
+  likes: { type: [String], default: [] },
+  comments: { type: [Object], default: [] },
   createdAt: {
     type: Date,
     default: new Date(),
